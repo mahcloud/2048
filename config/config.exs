@@ -11,10 +11,10 @@ config :twenty,
   ecto_repos: [Twenty.Repo]
 
 # Configures the endpoint
-config :twenty, TwentyWeb.Endpoint,
+config :twenty, Twenty.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "EV9iK/Les9ZSAeaoFvWmYKlV11RMg7iqSxKSE7TwIyuWax4Lj0QHfR4mtC7u7IDD",
-  render_errors: [view: TwentyWeb.ErrorView, accepts: ~w(html json), layout: false],
+  render_errors: [view: Twenty.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Twenty.PubSub,
   live_view: [signing_salt: "Dj60Ckby"]
 

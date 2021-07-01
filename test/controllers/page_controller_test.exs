@@ -1,5 +1,5 @@
-defmodule TwentyWeb.PageControllerTest do
-  use TwentyWeb.ConnCase
+defmodule Twenty.PageControllerTest do
+  use Twenty.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get(conn, "/")
