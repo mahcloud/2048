@@ -10,11 +10,11 @@ defmodule Twenty.Application do
       # Start the Ecto repository
       Twenty.Repo,
       # Start the Telemetry supervisor
-      TwentyWeb.Telemetry,
+      Twenty.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: Twenty.PubSub},
       # Start the Endpoint (http/https)
-      TwentyWeb.Endpoint
+      Twenty.Endpoint
       # Start a worker by calling: Twenty.Worker.start_link(arg)
       # {Twenty.Worker, arg}
     ]
@@ -28,7 +28,7 @@ defmodule Twenty.Application do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    TwentyWeb.Endpoint.config_change(changed, removed)
+    Twenty.Endpoint.config_change(changed, removed)
     :ok
   end
 end

@@ -1,4 +1,4 @@
-defmodule TwentyWeb.Endpoint do
+defmodule Twenty.Endpoint do
   use Phoenix.Endpoint, otp_app: :twenty
 
   # The session will be stored in the cookie and signed,
@@ -10,7 +10,7 @@ defmodule TwentyWeb.Endpoint do
     signing_salt: "45AgB/dz"
   ]
 
-  socket "/socket", TwentyWeb.UserSocket,
+  socket "/socket", Twenty.UserSocket,
     websocket: true,
     longpoll: false
 
@@ -50,5 +50,5 @@ defmodule TwentyWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug TwentyWeb.Router
+  plug Twenty.Router
 end

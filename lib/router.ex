@@ -1,5 +1,5 @@
-defmodule TwentyWeb.Router do
-  use TwentyWeb, :router
+defmodule Twenty.Router do
+  use Twenty.Web, :router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -13,14 +13,14 @@ defmodule TwentyWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", TwentyWeb do
+  scope "/", Twenty do
     pipe_through :browser
 
     get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", TwentyWeb do
+  # scope "/api", Twenty do
   #   pipe_through :api
   # end
 
@@ -36,7 +36,7 @@ defmodule TwentyWeb.Router do
 
     scope "/" do
       pipe_through :browser
-      live_dashboard "/dashboard", metrics: TwentyWeb.Telemetry
+      live_dashboard "/dashboard", metrics: Twenty.Telemetry
     end
   end
 end

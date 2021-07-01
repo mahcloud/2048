@@ -1,12 +1,12 @@
-defmodule TwentyWeb do
+defmodule Twenty.Web do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, views, channels and so on.
 
   This can be used in your application as:
 
-      use TwentyWeb, :controller
-      use TwentyWeb, :view
+      use Twenty.Web, :controller
+      use Twenty.Web, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -19,19 +19,19 @@ defmodule TwentyWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: TwentyWeb
+      use Phoenix.Controller, namespace: Twenty
 
       import Plug.Conn
-      import TwentyWeb.Gettext
-      alias TwentyWeb.Router.Helpers, as: Routes
+      import Twenty.Gettext
+      alias Twenty.Router.Helpers, as: Routes
     end
   end
 
   def view do
     quote do
       use Phoenix.View,
-        root: "lib/twenty_web/templates",
-        namespace: TwentyWeb
+        root: "lib/templates",
+        namespace: Twenty
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -54,7 +54,7 @@ defmodule TwentyWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import TwentyWeb.Gettext
+      import Twenty.Gettext
     end
   end
 
@@ -66,9 +66,9 @@ defmodule TwentyWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
-      import TwentyWeb.ErrorHelpers
-      import TwentyWeb.Gettext
-      alias TwentyWeb.Router.Helpers, as: Routes
+      import Twenty.ErrorHelpers
+      import Twenty.Gettext
+      alias Twenty.Router.Helpers, as: Routes
     end
   end
 

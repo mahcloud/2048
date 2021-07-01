@@ -1,5 +1,5 @@
-defmodule TwentyWeb.PageController do
-  use TwentyWeb, :controller
+defmodule Twenty.PageController do
+  use Twenty.Web, :controller
 
   def index(conn, _params) do
     render(conn, "index.html")

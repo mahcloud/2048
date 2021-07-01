@@ -1,8 +1,8 @@
-defmodule TwentyWeb.UserSocket do
+defmodule Twenty.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", TwentyWeb.RoomChannel
+  # channel "room:*", Twenty.RoomChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
@@ -27,7 +27,7 @@ defmodule TwentyWeb.UserSocket do
   # Would allow you to broadcast a "disconnect" event and terminate
   # all active sockets and channels for a given user:
   #
-  #     TwentyWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
+  #     Twenty.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
   @impl true

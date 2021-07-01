@@ -1,5 +1,5 @@
-defmodule TwentyWeb.ErrorView do
-  use TwentyWeb, :view
+defmodule Twenty.ErrorView do
+  use Twenty.Web, :view
 
   # If you want to customize a particular status code
   # for a certain format, you may uncomment below.
