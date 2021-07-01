@@ -1,12 +1,16 @@
 defmodule TwentyWeb.Router do
   use TwentyWeb, :router
 
-  pipeline :browser do
+  pipeline :dashboard do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+  end
+
+  pipeline :browser do
+    plug :accepts, ["html"]
   end
 
   pipeline :api do
@@ -16,7 +20,11 @@ defmodule TwentyWeb.Router do
   scope "/", TwentyWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", GamesController, :index
+    get "/games/new", GamesController, :new
+    post "/games/new", GamesController, :create
+    get "/games/:name", GamesController, :view
+    post "/games/:name", GamesController, :combine
   end
 
   # Other scopes may use custom stacks.
@@ -35,7 +43,7 @@ defmodule TwentyWeb.Router do
     import Phoenix.LiveDashboard.Router
 
     scope "/" do
-      pipe_through :browser
+      pipe_through :dashboard
       live_dashboard "/dashboard", metrics: TwentyWeb.Telemetry
     end
   end

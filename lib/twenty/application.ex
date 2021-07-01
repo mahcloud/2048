@@ -14,15 +14,17 @@ defmodule Twenty.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Twenty.PubSub},
       # Start the Endpoint (http/https)
-      TwentyWeb.Endpoint
+      TwentyWeb.Endpoint,
       # Start a worker by calling: Twenty.Worker.start_link(arg)
-      # {Twenty.Worker, arg}
+      # {Twenty.Games, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Twenty.Supervisor]
     Supervisor.start_link(children, opts)
+
+    Supervisor.start_link([Twenty.Games], [strategy: :one_for_one])
   end
 
   # Tell Phoenix to update the endpoint configuration
