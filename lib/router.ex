@@ -15,8 +15,6 @@ defmodule Twenty.Router do
 
   scope "/", Twenty do
     pipe_through :browser
-
-    get "/", PageController, :index
   end
 
   # Other scopes may use custom stacks.
