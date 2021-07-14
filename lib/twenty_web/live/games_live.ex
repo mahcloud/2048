@@ -1,4 +1,4 @@
-defmodule TwentyWeb.PageLive do
+defmodule TwentyWeb.GamesLive do
   use TwentyWeb, :live_view
 
   @impl true

@@ -31,7 +31,7 @@ defmodule TwentyWeb.Router do
   scope "/", TwentyWeb do
     pipe_through :liveview
 
-    live "/", PageLive, :index
+    live "/", GamesLive, :index
   end
 
   scope "/", TwentyWeb do
