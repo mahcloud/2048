@@ -5,12 +5,24 @@ defmodule TwentyWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
+    plug :put_root_layout, {TwentyWeb.LayoutView, :root}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
+  pipeline :liveview do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, {TwentyWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
 
   pipeline :browser do
     plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_flash
   end
 
   pipeline :api do
@@ -18,9 +30,15 @@ defmodule TwentyWeb.Router do
   end
 
   scope "/", TwentyWeb do
+    pipe_through :liveview
+
+    live "/", PageLive, :index
+  end
+
+  scope "/", TwentyWeb do
     pipe_through :browser
 
-    get "/", GamesController, :index
+    get "/games/", GamesController, :index
     get "/games/new", GamesController, :new
     post "/games/new", GamesController, :create
     get "/games/:name", GamesController, :view
