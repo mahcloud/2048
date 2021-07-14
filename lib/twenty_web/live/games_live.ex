@@ -3,18 +3,20 @@ defmodule TwentyWeb.GamesLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, reset_socket(%{ socket: socket })}
+    {:ok, socket |> assign(%{games: get_games(), name: ""})}
   end
 
   @impl true
   def handle_event("create_form_name", %{"name" => name}, socket) do
-    {:ok, %{socket_params: %{name: name}, socket: socket}}
+    {:ok, %{socket: socket, socket_params: %{name: name}}}
     |> reply()
   end
   def handle_event("create", %{"name" => name}, socket) do
-    {:ok, %{socket_params: %{name: name}, socket: socket}}
-    |> validate_name()
+    {:ok, %{socket: socket, socket_params: %{name: name}}}
+    |> validate_required()
+    |> validate_unique()
     |> create_game()
+    |> redirect()
     |> clear_name()
     |> reply()
   end
@@ -23,8 +25,8 @@ defmodule TwentyWeb.GamesLive do
   ### PRIVATE
   ###
 
-  defp clear_name({:ok, %{socket_params: socket_params, socket: socket}}) do
-    {:ok, %{socket_params: socket_params |> Map.delete(:name), socket: socket }}
+  defp clear_name({:ok, %{socket: socket, socket_params: socket_params}}) do
+    {:ok, %{socket: socket, socket_params: socket_params |> Map.delete(:name)}}
   end
   defp clear_name(params), do: params
 
@@ -41,16 +43,21 @@ defmodule TwentyWeb.GamesLive do
     Twenty.Games.get_games(pid)
   end
 
-  defp reply({:ok, %{socket_params: %{games: _games, name: _name} = socket_params, socket: socket}}) do
+  defp redirect({:ok, %{socket: socket, socket_params: %{name: name}} = params}) do
+    {:ok, params |> Map.put(:socket, socket |> redirect(to: "/games/#{name}"))}
+  end
+  defp redirect(params), do: params
+
+  defp reply({:ok, %{socket: socket, socket_params: %{games: _games, name: _name} = socket_params}}) do
     {:noreply, socket |> assign(socket_params)}
   end
-  defp reply({:error, %{error: error, socket_params: %{games: _games, name: _name} = socket_params, socket: socket}}) do
+  defp reply({:error, %{error: error, socket: socket, socket_params: %{games: _games, name: _name} = socket_params}}) do
     socket = socket
     |> put_flash(:error, error)
     |> assign(socket_params)
     {:noreply, socket}
   end
-  defp reply({:error, %{socket_params: %{games: _games, name: _name}, socket: _socket} = params}) do
+  defp reply({:error, %{socket: _socket, socket_params: %{games: _games, name: _name}} = params}) do
     reply({:error, params |> Map.put(:error, "Something went wrong")})
   end
   defp reply({status, %{socket_params: %{games: _games} = socket_params} = params}) do
@@ -60,21 +67,27 @@ defmodule TwentyWeb.GamesLive do
     reply({status, params |> Map.put(:socket_params, socket_params |> Map.put(:games, get_games()))})
   end
 
-  defp validate_name({:ok, %{socket_params: %{name: nil}} = params}) do
+  defp validate_required({:ok, %{socket_params: %{name: nil}} = params}) do
     {:error, params |> Map.put(:error, "Name is required")}
   end
-  defp validate_name({:ok, %{socket_params: %{name: ""}} = params}) do
+  defp validate_required({:ok, %{socket_params: %{name: ""}} = params}) do
     {:error, params |> Map.put(:error, "Name is required")}
   end
-  defp validate_name({:ok, %{socket_params: %{name: name}} = params}) do
-    case String.trim(name) do
+  defp validate_required({:ok, %{socket_params: %{name: name} = socket_params} = params}) do
+    String.trim(name)
+    |> case do
       "" -> {:error, params |> Map.put(:error, "Name is required")}
-      _ -> {:ok, params}
+      trimmed_name -> {:ok, params |> Map.put(:socket_params, socket_params |> Map.put(:name, trimmed_name))}
     end
   end
 
-  defp reset_socket(%{ socket: socket }) do
-    socket
-    |> assign(%{games: get_games(), name: ""})
+  defp validate_unique({:ok, %{socket_params: %{name: name}} = params}) do
+    get_games()
+    |> Enum.map(fn {_pid, game_name} -> game_name end)
+    |> Enum.member?(name)
+    |> case do
+      false -> {:ok, params}
+      _ -> {:error, params |> Map.put(:error, "Name is already taken")}
+    end
   end
 end
