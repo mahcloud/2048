@@ -1,0 +1,18 @@
+<section class="phx-hero">
+  <h1>Welcome to 2048!</h1>
+</section>
+<section>
+  <%= for {_pid, game_name} <- @games do %>
+    <div>
+      <a href="/games/<%= game_name %>"><%= game_name %></a>
+    </div>
+  <% end %>
+</section>
+<section>
+  <p>Get started by creating a game</p>
+
+  <form phx-change="create_form_name" phx-submit="create">
+    <input type="text" name="name" value="<%= @name %>" placeholder="Name" autocomplete="off"/>
+    <button type="submit" phx-disable-with="Creating...">Create</button>
+  </form>
+</section>
