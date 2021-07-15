@@ -46,11 +46,8 @@ defmodule Twenty.Game do
     end
   end
   def handle_call(:increment, _, state) do
-    Twenty.Board.increment(state)
-    |> case do
-      {:ok, board} -> {:reply, {:ok, board}, board}
-      {:error, board, error} -> {:reply, {:error, error}, board}
-    end
+    board = Twenty.Board.increment(state)
+    {:reply, {:ok, board}, board}
   end
 
   def start_link(_opts) do
