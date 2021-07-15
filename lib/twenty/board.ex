@@ -1,72 +1,107 @@
 defmodule Twenty.Board do
-  def combine(%{board: board, direction: direction, location: {x, y}}) do
-    {:ok, %{board: board, direction: direction, x: x, y: y}}
-    |> calculate_value()
-    |> calculate_direction()
-    |> validate_value()
-    |> validate_x()
-    |> validate_y()
-    |> run_combine()
-    |> extract_board()
+  # new row
+  def combine(%{x: 4, y: y} = params), do: combine(params |> Map.put(:x, 0) |> Map.put(:y, y + 1))
+  # last row
+  def combine(%{board: board, y: 4}), do: {:ok, board}
+  def combine(%{direction: :left, x: 0} = params), do: combine(params |> Map.put(:x, 1))
+  def combine(%{direction: :right, x: 3} = params), do: combine(params |> Map.put(:x, 4))
+  def combine(%{direction: :down, x: x, y: 3} = params), do: combine(params |> Map.put(:x, x + 1))
+  def combine(%{direction: :up, x: x, y: 0} = params), do: combine(params |> Map.put(:x, x + 1))
+  def combine(%{direction: direction, board: board, original_board: original_board, x: x, y: y} = params) do
+    original_value = get_value(original_board, x, y)
+    value = get_value(board, x, y)
+    {next_value, next_x, next_y} = get_next_value(board, x, y, direction)
+
+    cond do
+      original_value != value -> combine(params |> Map.put(:x, x + 1))
+      value != nil && value == next_value -> combine_values(params, {x, y, value}, {next_x, next_y, next_value})
+      next_value == nil && value != nil -> combine_values(params, {x, y, value}, {next_x, next_y, next_value})
+      true -> combine(params |> Map.put(:x, x + 1))
+    end
+  end
+  def combine(%{board: board} = params), do: combine(params |> Map.put(:x, 0) |> Map.put(:y, 0) |> Map.put(:original_board, board))
+
+  def increment(board) do
+    nils = board
+    |> find_nil_indexes()
+
+    cond do
+      length(nils) == 0 -> board
+      true ->
+        {x, y} = nils
+        |> Enum.random()
+
+        board
+        |> replace_value(x, y, 1)
+    end
   end
 
   ###
   ### PRIVATE
   ###
 
-  defp calculate_direction({:ok, %{direction: :down, y: y} = data}), do: {:ok, data |> Map.put(:y, y + 1)}
-  defp calculate_direction({:ok, %{direction: :left, x: x} = data}), do: {:ok, data |> Map.put(:x, x - 1)}
-  defp calculate_direction({:ok, %{direction: :right, x: x} = data}), do: {:ok, data |> Map.put(:x, x + 1)}
-  defp calculate_direction({:ok, %{direction: :up, y: y} = data}), do: {:ok, data |> Map.put(:y, y - 1)}
-  defp calculate_direction({:error, data}), do: {:error, data}
+  defp combine_values(%{board: board} = params, {x, y, value}, {next_x, next_y, next_value}) do
+    new_value = next_value
+    |> case do
+      nil -> value
+      _ -> value + next_value
+    end
 
-  defp calculate_value({:ok, %{board: board, x: x, y: y} = data}) do
-    value = board
+    board = board
+    |> replace_value(next_x, next_y, new_value)
+    |> replace_value(x, y, nil)
+
+    params = params
+    |> Map.put(:board, board)
+    |> Map.put(:x, x + 1)
+
+    combine(params)
+  end
+
+  defp find_nil_indexes(board) do
+    board
+    |> Enum.with_index()
+    |> Enum.reduce([], fn {row, index}, acc ->
+      acc |> Enum.concat(row |> find_nil_indexes_in_row(index))
+    end)
+  end
+
+  defp find_nil_indexes_in_row(row, y) do
+    row
+    |> Enum.with_index()
+    |> Enum.filter(fn {tile, _index} -> tile == nil end)
+    |> Enum.map(fn {_tile, x} -> {x, y} end)
+  end
+
+  defp get_next_value(board, x, y, :down) do
+    y = y + 1
+    {get_value(board, x, y), x, y}
+  end
+  defp get_next_value(board, x, y, :left) do
+    x = x - 1
+    {get_value(board, x, y), x, y}
+  end
+  defp get_next_value(board, x, y, :right) do
+    x = x + 1
+    {get_value(board, x, y), x, y}
+  end
+  defp get_next_value(board, x, y, :up) do
+    y = y - 1
+    {get_value(board, x, y), x, y}
+  end
+
+  defp get_value(board, x, y) do 
+    board
     |> Enum.at(y)
     |> Enum.at(x)
-    {:ok, data |> Map.put(:value, value)}
   end
-  defp calculate_value({:error, data}), do: {:error, data}
 
-  defp extract_board({:ok, %{board: board}}), do: {:ok, board}
-  defp extract_board({:error, %{board: board, error: error}}), do: {:error, board, error}
-
-  defp run_combine({:ok, %{board: board, value: value, x: x, y: y} = data}) do
+  defp replace_value(board, x, y, value) do
     row = board
     |> Enum.at(y)
-    |> List.replace_at(x, value + value)
+    |> List.replace_at(x, value)
 
-    new_board = board
+    board
     |> List.replace_at(y, row)
-
-    {:ok, data |> Map.put(:board, new_board)}
   end
-  defp run_combine({:error, data}), do: {:error, data}
-
-  defp validate_value({:ok, %{board: board, value: original_value, x: x, y: y} = data}) do
-    value = board
-    |> Enum.at(y)
-    |> Enum.at(x)
-
-    if value === original_value do
-      {:ok, data}
-    else
-      {:error, data |> Map.put(:error, "Values do not match #{original_value} and #{value}")}
-    end
-  end
-  defp validate_value({:error, data}), do: {:error, data}
-
-  defp validate_x({:ok, %{x: 0} = data}), do: {:ok, data}
-  defp validate_x({:ok, %{x: 1} = data}), do: {:ok, data}
-  defp validate_x({:ok, %{x: 2} = data}), do: {:ok, data}
-  defp validate_x({:ok, %{x: 3} = data}), do: {:ok, data}
-  defp validate_x({:ok, data}), do: {:error, data |> Map.put(:error, "Location is invalid. X is invalid")}
-  defp validate_x({:error, data}), do: {:error, data}
-
-  defp validate_y({:ok, %{y: 0} = data}), do: {:ok, data}
-  defp validate_y({:ok, %{y: 1} = data}), do: {:ok, data}
-  defp validate_y({:ok, %{y: 2} = data}), do: {:ok, data}
-  defp validate_y({:ok, %{y: 3} = data}), do: {:ok, data}
-  defp validate_y({:ok, data}), do: {:error, data |> Map.put(:error, "Location is invalid. Y is invalid")}
-  defp validate_y({:error, data}), do: {:error, data}
 end

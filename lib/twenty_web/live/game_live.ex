@@ -90,9 +90,14 @@ defmodule TwentyWeb.GameLive do
   end
 
   defp move({:ok, %{direction: direction, game_pid: game_pid} = params}) do
-    Twenty.Game.combine(game_pid, {0, 0}, get_direction_atom(direction))
+    Twenty.Game.combine(game_pid, get_direction_atom(direction))
     |> case do
-      {:ok, _} -> {:ok, params}
+      {:ok, _} ->
+        Twenty.Game.increment(game_pid)
+        |> case do
+          {:ok, _} -> {:ok, params}
+          {:error, error} -> {:error, params |> Map.put(:error, error)}
+        end
       {:error, error} -> {:error, params |> Map.put(:error, error)}
     end
   end

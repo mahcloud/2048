@@ -2,14 +2,21 @@ defmodule Twenty.Game do
   use GenServer
 
   @initial_state [
-    [1, 1, 1, 1 ],
-    [1, 1, 1, 1 ],
-    [1, 1, 1, 1 ],
-    [1, 1, 1, 1 ],
+    [nil, nil, nil, nil],
+    [nil, nil, nil, nil],
+    [nil, nil, nil, nil],
+    [nil, nil, nil, nil],
   ]
 
   def start() do
     start_link([])
+  end
+
+  def combine(direction) do
+    GenServer.call(__MODULE__, {:combine, direction})
+  end
+  def combine(pid, direction) do
+    GenServer.call(pid, {:combine, direction})
   end
 
   def end_game(pid, reason \\ :normal, timeout \\ :infinity) do
@@ -19,12 +26,8 @@ defmodule Twenty.Game do
   def get_board(), do: GenServer.call(__MODULE__, :board)
   def get_board(pid), do: GenServer.call(pid, :board)
 
-  def combine(location, direction) do
-    GenServer.call(__MODULE__, {:combine, location, direction})
-  end
-  def combine(pid, location, direction) do
-    GenServer.call(pid, {:combine, location, direction})
-  end
+  def increment(), do: GenServer.call(__MODULE__, :increment)
+  def increment(pid), do: GenServer.call(pid, :increment)
 
   ###
   ### Internal
@@ -35,8 +38,15 @@ defmodule Twenty.Game do
   end
 
   def handle_call(:board, _, state), do: {:reply, state, state}
-  def handle_call({:combine, location, direction}, _, state) do
-    Twenty.Board.combine(%{board: state, direction: direction, location: location})
+  def handle_call({:combine, direction}, _, state) do
+    Twenty.Board.combine(%{board: state, direction: direction})
+    |> case do
+      {:ok, board} -> {:reply, {:ok, board}, board}
+      {:error, board, error} -> {:reply, {:error, error}, board}
+    end
+  end
+  def handle_call(:increment, _, state) do
+    Twenty.Board.increment(state)
     |> case do
       {:ok, board} -> {:reply, {:ok, board}, board}
       {:error, board, error} -> {:reply, {:error, error}, board}
@@ -44,6 +54,11 @@ defmodule Twenty.Game do
   end
 
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, @initial_state)
+    state = 4..10
+    |> Enum.reduce(@initial_state, fn _n, acc ->
+      acc |> Twenty.Board.increment()
+    end)
+
+    GenServer.start_link(__MODULE__, state)
   end
 end
