@@ -80,6 +80,7 @@ defmodule TwentyWeb.GamesLive do
       trimmed_name -> {:ok, params |> Map.put(:socket_params, socket_params |> Map.put(:name, trimmed_name))}
     end
   end
+  defp validate_required(params), do: params
 
   defp validate_unique({:ok, %{socket_params: %{name: name}} = params}) do
     get_games()
@@ -90,4 +91,5 @@ defmodule TwentyWeb.GamesLive do
       _ -> {:error, params |> Map.put(:error, "Name is already taken")}
     end
   end
+  defp validate_unique(params), do: params
 end
