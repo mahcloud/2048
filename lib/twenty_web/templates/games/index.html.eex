@@ -1,5 +1,0 @@
-<a href="/games/new">Create a new game</a>
-<br/>
-<%= Enum.map(@games, fn({_id, name}) -> %>
-  <a href="/games/<%= name %>"><%= name %></a><br/>
-<% end) %>

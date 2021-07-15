@@ -1,0 +1,45 @@
+<style>
+  .button-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .button-row > div {
+    flex: 0 0 75px;
+  }
+  .button-row > div > button {
+    width: 100%;
+  }
+</style>
+<section class="phx-hero">
+  <h1><%= @name %></h1>
+</section>
+<section>
+  <%= Enum.map(@board, fn(row) -> %>
+    <div>
+      <%= Enum.map(row, fn(number) -> %>
+        <span><%= number %></span>
+      <% end) %>
+    </div>
+  <% end) %>
+</section>
+<section>
+  <div class="button-row">
+    <div></div>
+    <div>
+      <button phx-click="up">Up</button>
+    </div>
+    <div></div>
+  </div>
+  <div class="button-row">
+    <div>
+      <button phx-click="left">Left</button>
+    </div>
+    <div>
+      <button phx-click="down">Down</button>
+    </div>
+    <div>
+      <button phx-click="right">Right</button>
+    </div>
+  </div>
+</section>

@@ -32,16 +32,8 @@ defmodule TwentyWeb.Router do
     pipe_through :liveview
 
     live "/", GamesLive, :index
-  end
-
-  scope "/", TwentyWeb do
-    pipe_through :browser
-
-    get "/games/", GamesController, :index
-    get "/games/new", GamesController, :new
-    post "/games/new", GamesController, :create
-    get "/games/:name", GamesController, :view
-    post "/games/:name", GamesController, :combine
+    live "/games/", GamesLive, :index
+    live "/games/:name", GameLive, :index
   end
 
   # Other scopes may use custom stacks.
