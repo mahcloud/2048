@@ -1,14 +1,26 @@
 <style>
+  .board-row {
+    display: flex;
+    flex-direction: row;
+  }
+  .board-row > .board-piece {
+    flex: 0 0 75px;
+    text-align: center;
+    height: 75px;
+    line-height: 75px;
+    border: 2px solid #6699CC;
+    margin: 2px;
+  }
   .button-row {
     display: flex;
     flex-direction: row;
-    align-items: center;
   }
   .button-row > div {
     flex: 0 0 75px;
   }
   .button-row > div > button {
     width: 100%;
+    height: 35px;
   }
 </style>
 <section class="phx-hero">
@@ -17,13 +29,15 @@
 </section>
 <section>
   <%= Enum.map(@board, fn(row) -> %>
-    <div>
+    <div class="board-row">
       <%= Enum.map(row, fn(number) -> %>
-        <span><%= number %></span>
+        <span class="board-piece"><%= number %></span>
       <% end) %>
     </div>
   <% end) %>
 </section>
+<br/>
+<br/>
 <section>
   <div class="button-row">
     <div></div>
