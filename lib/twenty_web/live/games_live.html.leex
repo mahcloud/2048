@@ -1,3 +1,8 @@
+<style>
+  span.invalid-feedback {
+    margin: 0;
+  }
+</style>
 <section class="phx-hero">
   <h1>Welcome to 2048!</h1>
 </section>
@@ -11,8 +16,15 @@
 <section>
   <p>Get started by creating a game</p>
 
-  <form phx-change="create_form_name" phx-submit="create">
-    <input type="text" name="name" value="<%= @name %>" placeholder="Name" autocomplete="off"/>
-    <button type="submit" phx-disable-with="Creating...">Create</button>
+  <%= form = form_for @game, "#",
+    id: "game-form",
+    phx_change: "validate",
+    phx_submit: "create"
+  %>
+    <%= label form, :name %>
+    <%= text_input form, :name %>
+    <%= submit "Create", phx_disable_with: "Creating..." %>
+
+    <%= error_tag form, :name %>
   </form>
 </section>
